@@ -1,0 +1,205 @@
+/* ---------- design tokens ---------- */
+:root {
+  --blue:        #0a5ed7;
+  --blue-dark:   #084ba8;
+  --text:        #1b1f27;
+  --text-muted:  #6b7280;
+  --border:      #dfe3e8;
+  --bg:          #ffffff;
+  --bg-alt:      #f6f8fa;
+  --warning-bg:  #fdf6e3;
+  --warning-brd: #e8d9a8;
+  --green:       #0a7d3f;
+  --radius:      6px;
+  --row-h:       40px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg-alt);
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.page {
+  max-width: 1400px;
+  margin: 16px auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ---------- search bar ---------- */
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+  padding: 14px 16px;
+  border-bottom: 2px solid var(--border);
+}
+.search-bar__title { margin-right: auto; }
+.search-bar__title h1 { margin: 0; font-size: 15px; font-weight: 600; }
+.search-bar__count { margin: 2px 0 0; font-size: 11px; color: var(--text-muted); }
+.search-bar__filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.search-bar__error { flex-basis: 100%; margin: 0; color: #b42318; font-size: 12px; }
+
+.field { display: flex; align-items: center; gap: 6px; }
+.field__label { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.field select,
+.field input {
+  height: 30px;
+  padding: 0 8px;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.field select:focus-visible,
+.field input:focus-visible,
+.btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  font: inherit; cursor: pointer;
+  border: 1px solid transparent; border-radius: 4px;
+  background: none; color: inherit;
+}
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn--primary {
+  height: 30px; padding: 0 24px;
+  color: #fff; background: var(--blue); border-radius: 15px; font-weight: 600;
+}
+.btn--primary:hover:not(:disabled) { background: var(--blue-dark); }
+.btn--link { color: var(--blue); text-decoration: none; border: 1px solid var(--border); border-radius: 12px; padding: 3px 10px; font-size: 11px; }
+.btn--icon { padding: 2px 6px; color: var(--text-muted); font-size: 15px; line-height: 1; }
+.btn--accept { padding: 5px 26px; color: #fff; background: var(--blue); border-radius: 13px; font-weight: 600; font-size: 11px; }
+.btn--reject { padding: 5px 18px; color: var(--blue); background: #fff; border-color: var(--blue); border-radius: 13px; font-weight: 600; font-size: 11px; }
+
+/* ---------- table ---------- */
+/* The WRAPPER scrolls sideways, never <body>. This is the rule that keeps
+   a 13-column table from breaking the whole page layout on a narrow screen. */
+.table-wrap { overflow-x: auto; }
+
+.order-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+.order-table th {
+  padding: 8px 10px;
+  font-size: 11px; font-weight: 500; color: var(--text-muted); text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.order-table td {
+  height: var(--row-h);
+  padding: 6px 10px;
+  border-bottom: 1px solid #f0f2f5;
+}
+.order-table [data-align="right"]  { text-align: right; }
+.order-table [data-align="center"] { text-align: center; }
+.order-row__toggle { width: 32px; text-align: center; }
+.row-group:hover .order-row td { background: #fafbfc; }
+.row-group--expanded .order-row td { background: #f2f7fd; }
+
+.cell-link { color: var(--blue); font-weight: 600; }
+.chevron { display: inline-block; transition: transform .15s ease; }
+.chevron--down { transform: rotate(90deg); }
+
+.th-sort {
+  display: inline-flex; align-items: center; gap: 4px;
+  font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0;
+}
+.th-sort__icon { font-size: 9px; }
+
+/* ---------- status ---------- */
+.status { display: inline-flex; align-items: center; gap: 5px; }
+.status__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--blue); flex: none; }
+
+/* ---------- expanded detail ---------- */
+.detail-row td { padding: 0; background: var(--bg-alt); }
+.detail { padding: 12px 16px 16px 44px; white-space: normal; }
+.detail--loading, .detail--error { color: var(--text-muted); }
+.detail__header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.detail__client { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--blue); }
+.detail__account { color: var(--blue); font-weight: 500; }
+.detail__actions { margin-left: auto; display: flex; gap: 8px; }
+
+/* Label/value grid. On mobile this collapses to one column (see media query). */
+.detail__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 6px 24px;
+  margin: 0 0 12px;
+}
+.detail__fields > div { display: flex; gap: 6px; }
+.detail__fields dt { color: var(--text-muted); }
+.detail__fields dd { margin: 0; font-weight: 600; }
+
+.warnings {
+  padding: 10px 14px;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-brd);
+  border-radius: 4px;
+}
+.warnings__title { margin: 0 0 6px; font-size: 12px; font-weight: 600; }
+.warnings ul { margin: 0; padding-left: 18px; color: #5c4b18; }
+.warnings li { margin-bottom: 3px; }
+
+/* ---------- states ---------- */
+.state { padding: 48px 16px; text-align: center; color: var(--text-muted); }
+.state--error p { color: #b42318; }
+.state__hint { font-size: 12px; }
+
+.skeleton {
+  display: block; height: 12px; border-radius: 3px;
+  background: linear-gradient(90deg, #eef1f4 25%, #e3e8ee 50%, #eef1f4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.sentinel { display: flex; justify-content: center; align-items: center; height: 56px; }
+.sentinel__end { color: var(--text-muted); font-size: 11px; }
+.spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--border); border-top-color: var(--blue);
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Respect users who asked the OS to reduce motion. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton, .spinner, .chevron { animation: none; transition: none; }
+}
+
+/* ================= MOBILE ================= */
+/* The column COUNT is handled in JS (columns.ts) so the markup is honest —
+   CSS here only handles layout reflow. Hiding columns with display:none
+   would still ship all 13 cells to the DOM for every row. */
+@media (max-width: 768px) {
+  .page { margin: 0; border: 0; border-radius: 0; }
+
+  .search-bar { gap: 10px; }
+  .search-bar__title { margin-right: 0; flex-basis: 100%; }
+  .search-bar__filters { width: 100%; }
+  .search-bar__filters .field { flex: 1 1 46%; }
+  .field select, .field input { width: 100%; min-width: 0; }
+  .search-bar__filters .btn--primary { flex-basis: 100%; }
+
+  .order-table { white-space: normal; }
+  .order-table td { height: auto; padding: 10px; }
+
+  .detail { padding: 12px; }
+  /* One column: labels above values reads better in a narrow gutter. */
+  .detail__fields { grid-template-columns: 1fr; }
+  .detail__actions { margin-left: 0; width: 100%; }
+  .detail__actions .btn { flex: 1; }
+}
