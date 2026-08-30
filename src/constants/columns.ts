@@ -23,7 +23,7 @@ export const ORDER_COLUMNS: ReadonlyArray<ColumnDef> = [
   { key: 'symbol', label: 'Symbol', mobile: true, sortable: true },
   { key: 'description', label: 'Description', mobile: false, sortable: true },
   { key: 'quantity', label: 'Qty.', mobile: false, align: 'right', sortable: true },
-  { key: 'filledQuantity', label: 'Filled Qty', mobile: false, align: 'right' },
+  { key: 'filledQuantity', label: 'Filled Qty', mobile: false, align: 'right', sortable: true },
   { key: 'price', label: 'Price', mobile: false, align: 'right' },
   { key: 'status', label: 'Status', mobile: true },
   { key: 'orderDateTime', label: 'Date', mobile: false, sortable: true },
