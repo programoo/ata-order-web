@@ -18,19 +18,19 @@ export interface ColumnDef {
  * entry and both layouts stay correct by construction.
  */
 export const ORDER_COLUMNS: ReadonlyArray<ColumnDef> = [
-  { key: 'account',            label: 'Account',     mobile: true },
-  { key: 'operation',          label: 'Operation',   mobile: true },
-  { key: 'symbol',             label: 'Symbol',      mobile: true },
-  { key: 'description',        label: 'Description', mobile: false },
-  { key: 'quantity',           label: 'Qty.',        mobile: false, align: 'right' },
-  { key: 'filledQuantity',     label: 'Filled Qty',  mobile: false, align: 'right' },
-  { key: 'price',              label: 'Price',       mobile: false, align: 'right' },
-  { key: 'status',             label: 'Status',      mobile: true },
-  { key: 'orderDateTime',      label: 'Date',        mobile: false, sortable: true },
-  { key: 'expirationDateTime', label: 'Expiration',  mobile: false },
-  { key: 'referenceNo',        label: 'No. Ref.',    mobile: false },
-  { key: 'externalRef',        label: 'Ext. Ref.',   mobile: false },
-  { key: 'actions',            label: '',            mobile: false, align: 'center' },
+  { key: 'account', label: 'Account', mobile: true, sortable: true },
+  { key: 'operation', label: 'Operation', mobile: true },
+  { key: 'symbol', label: 'Symbol', mobile: true },
+  { key: 'description', label: 'Description', mobile: false },
+  { key: 'quantity', label: 'Qty.', mobile: false, align: 'right' },
+  { key: 'filledQuantity', label: 'Filled Qty', mobile: false, align: 'right' },
+  { key: 'price', label: 'Price', mobile: false, align: 'right' },
+  { key: 'status', label: 'Status', mobile: true },
+  { key: 'orderDateTime', label: 'Date', mobile: false, sortable: true },
+  { key: 'expirationDateTime', label: 'Expiration', mobile: false },
+  { key: 'referenceNo', label: 'No. Ref.', mobile: false },
+  { key: 'externalRef', label: 'Ext. Ref.', mobile: false },
+  { key: 'actions', label: '', mobile: false, align: 'center' },
 ];
 
 export function visibleColumns(isMobile: boolean): ReadonlyArray<ColumnDef> {
