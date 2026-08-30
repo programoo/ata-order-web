@@ -1,6 +1,48 @@
 import { http, HttpResponse, delay } from 'msw';
 import { ORDERS, getOrderDetail } from './data';
-import type { OrderSummary, Page } from '../types/order';
+import type { Money, OrderSummary, Page } from '../types/order';
+
+/**
+ * How each sortable field is COMPARED. The client only sends
+ * `sort=field,dir` (Spring Data's contract); the type of a field is
+ * server-side knowledge, so the mapping lives here — exactly where the
+ * real Spring Boot service would resolve it from the entity.
+ */
+type SortAs = 'string' | 'number' | 'money' | 'date';
+
+const SORT_AS: Partial<Record<keyof OrderSummary, SortAs>> = {
+  account: 'string',
+  operation: 'string',
+  symbol: 'string',
+  description: 'string',
+  quantity: 'number',
+  filledQuantity: 'number',
+  price: 'money',
+  status: 'string',
+  orderDateTime: 'date',
+  expirationDateTime: 'date',
+  referenceNo: 'string',
+  externalRef: 'string',
+};
+
+function compareBy(field: keyof OrderSummary, a: OrderSummary, b: OrderSummary): number {
+  const av = a[field];
+  const bv = b[field];
+
+  switch (SORT_AS[field] ?? 'string') {
+    // Stringified, 10 sorts before 9 — these must compare numerically.
+    case 'number':
+      return Number(av) - Number(bv);
+    // Money is { amount, currency }; String() on it yields [object Object].
+    case 'money':
+      return (av as Money).amount - (bv as Money).amount;
+    case 'date':
+      return Date.parse(av as string) - Date.parse(bv as string);
+    default:
+      // symbol is nullable; coalesce so null sorts as an empty string.
+      return String(av ?? '').localeCompare(String(bv ?? ''));
+  }
+}
 
 /**
  * These handlers implement the CONTRACT, not just canned JSON.
@@ -44,13 +86,7 @@ export const handlers = [
     // --- sorting ---
     const [sortField, sortDir = 'asc'] = sort.split(',');
     result = [...result].sort((a, b) => {
-      const av = a[sortField as keyof OrderSummary];
-      const bv = b[sortField as keyof OrderSummary];
-      // Numbers must compare numerically: stringified, 10 sorts before 9.
-      const cmp =
-        typeof av === 'number' && typeof bv === 'number'
-          ? av - bv
-          : String(av).localeCompare(String(bv));
+      const cmp = compareBy(sortField as keyof OrderSummary, a, b);
       return sortDir === 'desc' ? -cmp : cmp;
     });
 
