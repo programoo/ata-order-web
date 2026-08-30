@@ -46,7 +46,11 @@ export const handlers = [
     result = [...result].sort((a, b) => {
       const av = a[sortField as keyof OrderSummary];
       const bv = b[sortField as keyof OrderSummary];
-      const cmp = String(av).localeCompare(String(bv));
+      // Numbers must compare numerically: stringified, 10 sorts before 9.
+      const cmp =
+        typeof av === 'number' && typeof bv === 'number'
+          ? av - bv
+          : String(av).localeCompare(String(bv));
       return sortDir === 'desc' ? -cmp : cmp;
     });
 
