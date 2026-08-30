@@ -25,11 +25,11 @@ export const ORDER_COLUMNS: ReadonlyArray<ColumnDef> = [
   { key: 'quantity', label: 'Qty.', mobile: false, align: 'right', sortable: true },
   { key: 'filledQuantity', label: 'Filled Qty', mobile: false, align: 'right', sortable: true },
   { key: 'price', label: 'Price', mobile: false, align: 'right', sortable: true },
-  { key: 'status', label: 'Status', mobile: true },
+  { key: 'status', label: 'Status', mobile: true, sortable: true },
   { key: 'orderDateTime', label: 'Date', mobile: false, sortable: true },
-  { key: 'expirationDateTime', label: 'Expiration', mobile: false },
-  { key: 'referenceNo', label: 'No. Ref.', mobile: false },
-  { key: 'externalRef', label: 'Ext. Ref.', mobile: false },
+  { key: 'expirationDateTime', label: 'Expiration', mobile: false, sortable: true },
+  { key: 'referenceNo', label: 'No. Ref.', mobile: false, sortable: true },
+  { key: 'externalRef', label: 'Ext. Ref.', mobile: false, sortable: true },
   { key: 'actions', label: '', mobile: false, align: 'center' },
 ];
 
