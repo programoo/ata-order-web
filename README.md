@@ -122,41 +122,66 @@ Setting that variable switches the mock off (`src/main.tsx`) and points
 `api/client.ts` at the Spring Boot service. No component changes — including
 sorting, which is already expressed as a `Pageable`-shaped query parameter.
 
-## Responsive behaviour
+## Docker & Kubernetes
 
-`src/constants/columns.ts` is the single source of truth. Each column carries
-a `mobile: boolean` flag; at 768px and below the table renders only the four
-required columns — **Account, Operation, Symbol, Status**. Filtering happens
-in JS, not with `display: none`, so hidden cells are never added to the DOM
-— and their headers, sort buttons included, are never rendered either.
+The image is two stages: Node builds `dist/`, nginx serves it. In the cluster
+the browser never talks to the backend directly — nginx proxies it:
 
-The expanded detail panel reflows to a single column and still shows every
-field, so nothing is lost on a small screen.
+```
+browser ──► order-web (nginx :80) ──/api/──► salary-app (Spring Boot :8080)
+            same origin                      k8s Service name
+```
 
-## Notable implementation choices
+**The bundle is built with `VITE_API_BASE_URL=/api`**, a relative URL. That
+switches the mock off and makes every request same-origin, so there is no
+CORS and no backend address baked into the JS. A browser cannot resolve a k8s
+Service name, and `http://localhost:8080` would mean each viewer's own
+machine — so a relative URL plus a proxy is the only shape that works.
 
-- **Draft vs. committed search state.** `SearchBar` owns the form values
-  locally; only pressing Search promotes them to the React Query key. Lifting
-  every field to the parent would fire a request per keystroke.
-- **`useSyncExternalStore` for the breakpoint.** It reads during render, so
-  the first paint is already correct. The `useEffect` alternative flashes the
-  desktop layout for one frame on mobile.
-- **One cell renderer keyed by column.** `OrderRow` maps over whatever
-  columns it is handed, so the same component serves the 13-column desktop
-  table and the 4-column mobile one.
-- **`IntersectionObserver` sentinel** for infinite scroll — no scroll
-  listeners, no throttling, no `scrollHeight` math.
-- **Detail rows mount only when expanded.** That is what makes the fetch
-  lazy: opening a 123-row list costs one request, not 124.
-- **Seeded faker.** Data is stable across reloads, so sort order does not
-  shift under you and a bug is distinguishable from noise.
-- **Simulated latency** (`delay()` in `handlers.ts`). Without it the loading
-  skeleton renders for 0ms and its bugs stay hidden.
+| File | Role |
+|---|---|
+| `Dockerfile` | Sets `VITE_API_BASE_URL=/api` at build time; `API_UPSTREAM=http://salary-app` at run time. |
+| `nginx.conf` | Copied to `/etc/nginx/templates/`, so `${API_UPSTREAM}` is filled from the environment at container start. `location /api/` forwards the path unchanged. |
+| `.dockerignore` | Excludes `.env*` — the local dev URL must not leak into the image. |
 
-## MVP-2 notes
+nginx's template step substitutes only variables that exist in the
+environment, so its own `$uri` / `$scheme` are left alone.
 
-`Period` and `Status` are single-valued for MVP-1 but are modeled as string
-unions rendered from arrays in `constants/filters.ts`. Adding a value is one
-line there plus one in `types/order.ts` — no component changes. A new column
-is likewise one entry in `constants/columns.ts` plus its `renderCell` case,
-and one line in `SORT_AS` if it should sort by something other than text.
+### Deploy to minikube
+
+Images are not pushed to a registry; they are loaded into minikube and
+referenced by tag (`imagePullPolicy: IfNotPresent`). Bump the tag every
+build — reusing one means the node keeps the old image.
+
+```bash
+docker build -t ata-order-web:1.3 .
+minikube image load ata-order-web:1.3
+kubectl set image deploy/order-web '*=ata-order-web:1.3'
+kubectl rollout status deploy/order-web
+```
+
+Roll back with `kubectl rollout undo deploy/order-web`.
+
+### Pointing at a different backend
+
+The upstream is an environment variable, not a build input — no rebuild:
+
+```bash
+kubectl set env deploy/order-web API_UPSTREAM=http://other-service
+docker run -p 8081:80 -e API_UPSTREAM=http://host.docker.internal:8080 ata-order-web:1.3
+```
+
+nginx resolves the upstream host once, at startup, and exits if it cannot —
+so outside the cluster `API_UPSTREAM` must be set to something reachable.
+
+### Troubleshooting
+
+- **`/api/orders` returns 404.** The backend image predates the endpoint.
+  Check with `kubectl exec deploy/order-web -- wget -qO- http://salary-app/api/orders`;
+  if that 404s, rebuild and roll out `ata-salary-services` from a commit that
+  has `OrderController`.
+- **Requests go to `localhost:8080` or the table shows mock data.** The
+  bundle was not built by the `Dockerfile` — a local `npm run build` takes
+  `VITE_API_BASE_URL` from `.env` (or none, which enables the mock). Rebuild
+  the image with `docker build`.
+
