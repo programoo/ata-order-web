@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-web
+  labels:
+    app: order-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-web
+  template:
+    metadata:
+      labels:
+        app: order-web
+    spec:
+      containers:
+        - name: order-web
+          image: ata-order-web:1.2
+          # image lives only in the cluster's local store, never pull it
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
