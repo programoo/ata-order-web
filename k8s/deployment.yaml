@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: order-web
-          image: ata-order-web:1.2
+          image: ata-order-web:1.7
           # image lives only in the cluster's local store, never pull it
           imagePullPolicy: IfNotPresent
           ports:

@@ -194,6 +194,8 @@ same tag, the running pods don't change. Use a new tag each time:
 
 ```bash
 docker build -t ata-order-web:1.4 .
+# with no cache, will force creating new image.
+docker build --no-cache -t ata-order-web:1.7 .
 ```
 
 ```bash
