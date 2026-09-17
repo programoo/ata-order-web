@@ -14,6 +14,7 @@ const INITIAL_CRITERIA: OrderSearchCriteria = {
   to: '2023-01-31',
 };
 
+
 export function OrdersPage() {
   // COMMITTED criteria — only changes when Search is clicked.
   const [criteria, setCriteria] = useState<OrderSearchCriteria>(INITIAL_CRITERIA);
